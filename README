@@ -1,1 +1,9 @@
-please run the following commands one by one
+# This is a docker-compose.yml file for web
+# Mainly include: php-apache(discuz) + mysql(master/slave) + redis(master/slave01/slave02)
+# networks: subnet 192.168.10.0/24 
+
+please run the following commands one by one:
+	
+	sh auto_config_all.sh
+	sh ./scripts/sync_mysql.sh 
+	sh ./scripts/grant_mysqlDB_to_php.sh 
