@@ -1,7 +1,8 @@
 # This is a docker-compose.yml file for web
 # Mainly include: php-apache(discuz) + mysql(master/slave) + redis(master/slave01/slave02)
 # networks: subnet 192.168.10.0/24 
-
+# auther : caolinxi_neu@163.com
+###########################################################################################
 please run the following commands one by one:
 	
 	sh auto_config_all.sh
