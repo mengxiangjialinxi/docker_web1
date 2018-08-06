@@ -1,0 +1,23 @@
+#!/bin/bash
+# auto unzip Discuz.tar.gz and chmod discuz files
+# auther : <caolinxi_neu@163.com>
+# date   : 2018-08-06 10:25:06
+#################################################
+
+REDIS_MASTER=192.168.10.12
+cd ../php
+PATH=$PWD
+/usr/bin/echo $PATH
+
+if [ -d $PATH/discuz ];then
+	/usr/bin/rm -rf $PATH/discuz
+	echo -e "remove the discuz directory forcefully..."
+fi
+
+/usr/bin/unzip -oq $PATH/Discuz_X3.3_SC_UTF8.zip -d $PATH/discuz/
+/usr/bin/mv $PATH/discuz/upload/* $PATH/discuz
+/usr/bin/chmod o+w $PATH/discuz/config/ $PATH/discuz/data/ $PATH/discuz/uc_*/ -R
+
+# configure redis
+#/usr/bin/sed -i "/\['redis'\]\['server'\]/{s/''/'$REDIS_MASTER'/}" $PATH/discuz/config/config_global_default.php
+#/usr/bin/cp $PATH/discuz/config/config_global_default.php $PATH/discuz/config/config_global.php

@@ -1,0 +1,109 @@
+version: '2'
+services:
+
+  mysql-master:
+    build:
+      context: mysql/master
+    container_name: mysql-master
+    volumes:
+      - ./mysql/master/config/:/etc/mysql/:ro
+    hostname: mysql-master
+    restart: always
+    environment: 
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      web_net:
+        ipv4_address: 192.168.10.2
+
+  mysql-slave1:
+    build:
+      context: mysql/slave1
+    container_name: mysql-slave1
+    volumes:
+      - ./mysql/slave1/config/:/etc/mysql/:ro
+    hostname: mysql-slave1
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    links:
+      - mysql-master
+    networks:
+      web_net:
+        ipv4_address: 192.168.10.3
+  
+  redis-master:
+    build:
+      context: redis
+    container_name: redis-master
+    hostname: redis-master
+    restart: always
+    ports:
+      - "6379:6379"
+    expose:
+      - 6379
+    links:
+      - mysql-master
+    depends_on:
+      - mysql-master
+    networks:
+      web_net:
+        ipv4_address: 192.168.10.12
+
+  redis-slave01:
+    build:
+      context: redis
+    container_name: redis-slave01
+    hostname: redis-slave01
+    restart: always
+    ports:
+      - "6380:6379"
+    expose:
+      - 6379
+    command: /bin/bash -c "sleep 2 && redis-server --port 6380 --slaveof redis-master 6379"
+    depends_on:
+      - redis-master
+    networks:
+      web_net:
+        ipv4_address: 192.168.10.13
+
+  redis-slave02:
+    build:
+      context: redis
+    container_name: redis-slave02
+    hostname: redis-slave02
+    restart: always
+    ports:
+      - "6381:6379"
+    expose:
+      - 6379
+    command: /bin/bash -c "sleep 2 && redis-server --port 6381 --slaveof redis-master 6379"
+    depends_on:
+      - redis-master
+    networks:
+      web_net:
+        ipv4_address: 192.168.10.14
+
+  php-apache:
+    build:
+      context: php
+    container_name: php
+    hostname: php
+    volumes:
+      - ./php/discuz/:/var/www/html/
+    restart: always
+    ports:
+      - "80:80"
+    links:
+      - mysql-master
+    networks:
+      web_net:
+        ipv4_address: 192.168.10.22
+
+networks:
+  web_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.10.0/24
+          gateway: 192.168.10.1
